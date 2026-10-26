@@ -1,0 +1,6 @@
+<volume>
+  <name>debian-cloud-13-amd64.qcow2</name>
+  <target>
+    <format type="qcow2"/>
+  </target>
+</volume>

@@ -1,0 +1,3 @@
+/.images/
+/out/*/*.iso
+/src/registry.libsonnet

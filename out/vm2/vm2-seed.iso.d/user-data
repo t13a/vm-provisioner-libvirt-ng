@@ -1,0 +1,3 @@
+#cloud-config
+packages:
+- "qemu-guest-agent"

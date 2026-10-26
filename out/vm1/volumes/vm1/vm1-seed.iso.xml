@@ -1,0 +1,6 @@
+<volume>
+  <name>vm1-seed.iso</name>
+  <target>
+    <format type="raw"/>
+  </target>
+</volume>

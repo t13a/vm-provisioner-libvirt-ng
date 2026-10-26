@@ -1,0 +1,14 @@
+ethernets:
+  eth0:
+    addresses:
+    - "192.168.122.11/24"
+    match:
+      macaddress: "52:54:00:a8:7a:0b"
+    nameservers:
+      addresses:
+      - "192.168.122.1"
+      - "1.1.1.1"
+    routes:
+    - to: "default"
+      via: "192.168.122.1"
+version: 2

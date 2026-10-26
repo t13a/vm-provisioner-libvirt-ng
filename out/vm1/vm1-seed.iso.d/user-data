@@ -1,0 +1,6 @@
+#cloud-config
+packages:
+- "qemu-guest-agent"
+- "git"
+runcmd:
+- "systemctl enable --now qemu-guest-agent"
