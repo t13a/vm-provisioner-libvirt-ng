@@ -3,6 +3,8 @@
 .DELETE_ON_ERROR:
 MAKEFLAGS += --no-builtin-rules --no-builtin-variables --warn-undefined-variables
 SHELL := bash
+# With pipefail, never end a pipe in `grep -q`: it exits at the first match, so the
+# writer can die of SIGPIPE and fail the pipe. `grep ... >/dev/null` reads to the end.
 .SHELLFLAGS := -euo pipefail -O nullglob -c
 
 VIRSH ?= virsh
@@ -37,7 +39,7 @@ endef
 define create_pool
 if ! $(VIRSH) pool-info $(1) >/dev/null 2>&1; then $(VIRSH) pool-define pools/$(1).xml; fi; \
 $(VIRSH) pool-autostart $(if $(filter yes,$(POOL.$(1).autostart)),,--disable) $(1); \
-if ! $(VIRSH) pool-info $(1) | grep -q '^State: *running'; then $(VIRSH) pool-start --build $(1); fi;
+if ! $(VIRSH) pool-info $(1) | grep '^State: *running' >/dev/null; then $(VIRSH) pool-start --build $(1); fi;
 endef
 
 define create_volume
@@ -54,7 +56,7 @@ fi;
 endef
 
 define delete_pool
-if $(VIRSH) pool-info $(1) 2>/dev/null | grep -q '^State: *running'; then $(VIRSH) pool-destroy $(1); fi; \
+if $(VIRSH) pool-info $(1) 2>/dev/null | grep '^State: *running' >/dev/null; then $(VIRSH) pool-destroy $(1); fi; \
 if $(VIRSH) pool-info $(1) >/dev/null 2>&1; then $(VIRSH) pool-undefine $(1); fi;
 endef
 
@@ -86,10 +88,10 @@ create: download $(SEED)
 	$(VIRSH) autostart $(if $(filter yes,$(AUTOSTART)),,--disable) $(NAME)
 
 start:
-	if ! $(VIRSH) domstate $(NAME) | grep -q running; then $(VIRSH) start $(NAME); fi
+	if ! $(VIRSH) domstate $(NAME) | grep running >/dev/null; then $(VIRSH) start $(NAME); fi
 
 stop:
-	if $(VIRSH) domstate $(NAME) 2>/dev/null | grep -q running; then $(VIRSH) destroy $(NAME); fi
+	if $(VIRSH) domstate $(NAME) 2>/dev/null | grep running >/dev/null; then $(VIRSH) destroy $(NAME); fi
 
 # delete keeps what has deletionPolicy Retain. delete-all removes that too.
 delete: stop
