@@ -1,3 +1,2 @@
-/.images/
-/out/*/*.iso
-/src/registry.libsonnet
+/example/.images/
+/example/provisioners/*/*.iso

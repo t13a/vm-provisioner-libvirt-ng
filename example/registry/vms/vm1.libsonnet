@@ -1,4 +1,4 @@
-local r = import '../registry.libsonnet';
+local r = import '../index.jsonnet';
 local t = r.templates;
 
 t.base

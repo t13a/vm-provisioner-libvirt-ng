@@ -1,5 +1,6 @@
-// The renderer: turns VMs into the files that provisioner.mk reads.
-// This file and provisioner.mk share one contract, so they change together.
+// The renderer: turns the VMs of a registry into provisioners, the files that v1.mk reads.
+// This file and v1.mk share one contract, so they change together, and the renderer
+// writes v1.mk next to the provisioners so that they run without the renderer.
 //
 // A VM is an object whose visible sections mirror the format of their readers:
 //   domain, pools, volumes             libvirt XML
@@ -88,7 +89,7 @@ local checkName(where, s) =
   local bad = [c for c in std.stringChars(s) if std.member(' \t:=#$%/\\', c)];
   if std.length(bad) == 0 then true else fail(where, 'name must not contain ' + std.join('', bad));
 
-// libvirt needs a capacity. Without one in the XML, provisioner.mk fills it in at run time.
+// libvirt needs a capacity. Without one in the XML, v1.mk fills it in at run time.
 local capacityFrom(where, v) =
   if std.objectHas(v, 'capacity') then 'xml'
   else if get(v, 'upload', '') != '' then 'upload'
@@ -123,7 +124,7 @@ local check(name, vm, pools, vols) =
   ]));
 
 // ---------------------------------------------------------------------------
-// Provisioner variables: what provisioner.mk reads from vars.mk.
+// Provisioner variables: what v1.mk reads from vars.mk.
 // ---------------------------------------------------------------------------
 
 local yesNo(b) = if b then 'yes' else 'no';
@@ -155,7 +156,7 @@ local vars(name, vm, pools, vols) =
   }), vols, {});
 
 // ---------------------------------------------------------------------------
-// Files: the layout of out/<name>/.
+// Files: the layout of a provisioner, the directory of one VM.
 // ---------------------------------------------------------------------------
 
 local files(name, vm) =
@@ -168,7 +169,7 @@ local files(name, vm) =
   local seed = get(vm, 'seed', '');
   assert check(name, vm, pools, vols);
   {
-    Makefile: 'include vars.mk\ninclude ../../lib/provisioner.mk\n',
+    Makefile: 'include vars.mk\ninclude ../v1.mk\n',
     'vars.mk': mk(vars(name, vm, pools, vols)),
     'domain.xml': xml('domain', vm.domain),
   }
@@ -178,7 +179,10 @@ local files(name, vm) =
   + (if std.objectHas(vm, 'metaData') then { [seed + '.d/meta-data']: yaml(vm.metaData) } else {})
   + (if std.objectHas(vm, 'networkConfig') then { [seed + '.d/network-config']: yaml(vm.networkConfig) } else {});
 
-// vms: { name: VM }. Returns { 'name/path': content } for `jsonnet -S -m`.
-function(vms)
+// registry: the index of a registry, whose vms are { name: VM }.
+// Returns { 'name/path': content } and v1.mk for `jsonnet -S -m`.
+function(registry)
+  local vms = registry.vms;
   local out = { [name]: files(name, vms[name]) for name in std.objectFields(vms) };
   { [name + '/' + f]: out[name][f] for name in std.objectFields(out) for f in std.objectFields(out[name]) }
+  + { 'v1.mk': importstr 'v1.mk' }

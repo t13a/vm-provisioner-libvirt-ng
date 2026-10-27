@@ -1,5 +1,6 @@
 # The provisioner. It holds no VM data: everything comes from vars.mk and the
-# files that lib/renderer.libsonnet writes next to it, so the two change together.
+# files that main.jsonnet writes next to it, so the two change together.
+# The renderer copies this file next to the directories of the VMs, which include it.
 .DELETE_ON_ERROR:
 MAKEFLAGS += --no-builtin-rules --no-builtin-variables --warn-undefined-variables
 SHELL := bash

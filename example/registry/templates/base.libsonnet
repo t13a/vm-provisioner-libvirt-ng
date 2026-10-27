@@ -1,4 +1,4 @@
-// The base of every VM. Templates are mixins; see lib/renderer.libsonnet for the sections and hidden fields.
+// The base of every VM. Templates are mixins; see src/main.jsonnet for the sections and hidden fields.
 // `vm` is bound late to the final, fully merged VM, so templates can use values that the VM sets later.
 
 // A fixed UUID makes `virsh define` update the existing domain instead of failing.

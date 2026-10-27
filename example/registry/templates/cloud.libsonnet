@@ -1,5 +1,5 @@
 // Boots a cloud image with a NoCloud seed. Downloaded images are cached in imageDir,
-// relative to the VM directory out/<name>/.
+// relative to the directory of the VM, provisioners/<name>/.
 function(image, imageDir='../../.images') {
   local vm = self,
   local seedIso = vm.name + '-seed.iso',
