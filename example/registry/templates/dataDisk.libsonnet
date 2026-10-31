@@ -1,9 +1,9 @@
 // A data disk in the VM's own pool. By default it survives `make down`; `make delete-all` removes it.
-function(dev, gib, deletionPolicy='Retain') {
+function(dev, gib, lifecyclePolicy='Reusable') {
   local vm = self,
   local volume = vm.name + '-' + dev + '.qcow2',
   volumes+: { [vm.name]+: { [volume]: {
-    deletionPolicy:: deletionPolicy,
+    lifecyclePolicy:: lifecyclePolicy,
     name: volume,
     capacity: { '@unit': 'GiB', '#text': gib },
     target: { format: { '@type': 'qcow2' } },

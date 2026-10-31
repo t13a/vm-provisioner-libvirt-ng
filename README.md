@@ -29,8 +29,10 @@ Each VM gets its own Makefile. Its targets run on the host and need virsh, xorri
 ```console
 $ make -C provisioners/debian13 up              # create and start debian13
 $ make -C provisioners/debian13 wait-for-ready  # wait for SSH and cloud-init
-$ make -C provisioners/debian13 down            # delete debian13, but keep what has deletionPolicy Retain
+$ make -C provisioners/debian13 down            # delete debian13, but keep what is Reusable or Shared
 ```
+
+To create VMs in parallel, first run `make create-shared` for one VM at a time. It uploads what the VMs share, such as their images, so that no two VMs upload the same image at once.
 
 ## Layout
 

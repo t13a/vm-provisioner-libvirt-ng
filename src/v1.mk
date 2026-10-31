@@ -21,8 +21,8 @@ ssh_target = $(or $(SSH_USER),$$(id -un))@$(or $(SSH_HOST),$$($(VIRSH) domifaddr
 # Volumes are named POOL/VOLUME, and their records in vars.mk are VOLUME.POOL/VOLUME.*.
 pool_of = $(word 1,$(subst /, ,$(1)))
 vol_of = $(word 2,$(subst /, ,$(1)))
-# $(call deletable,VOLUME|POOL,NAMES): the names whose deletionPolicy is Delete.
-deletable = $(foreach x,$(2),$(if $(filter Delete,$($(1).$(x).deletionPolicy)),$(x)))
+# $(call with_policy,VOLUME|POOL,POLICIES,NAMES): the names whose lifecyclePolicy is one of POLICIES.
+with_policy = $(foreach x,$(3),$(if $(filter $(2),$($(1).$(x).lifecyclePolicy)),$(x)))
 
 # libvirt requires a capacity. When the XML has none, use the size of the uploaded
 # file or the capacity of the backing volume, as Makefile.j2 of v1alpha1 did.
@@ -62,7 +62,7 @@ if $(VIRSH) pool-info $(1) >/dev/null 2>&1; then $(VIRSH) pool-undefine $(1); fi
 endef
 
 # $(call teardown,VOLUMES,POOLS): undefine the domain, then delete the given volumes and pools.
-# Volumes go first, so a retained volume in a deleted pool keeps its file.
+# Volumes go first, so a volume that stays in a deleted pool keeps its file.
 define teardown
 if $(VIRSH) dominfo $(NAME) >/dev/null 2>&1; then $(VIRSH) undefine --nvram $(NAME); fi
 $(foreach v,$(1),$(call delete_volume,$(v)))
@@ -70,7 +70,7 @@ $(foreach p,$(2),$(call delete_pool,$(p)))
 rm -f $(SEED)
 endef
 
-.PHONY: up down download create start stop delete delete-all console ssh wait-for-ready
+.PHONY: up down download create-shared create start stop delete delete-all console ssh wait-for-ready
 up: create start
 down: delete
 
@@ -82,9 +82,15 @@ $(SEED): $(wildcard $(SEED).d/*)
 	$(MKISOFS) -quiet -output $@ -volid cidata -joliet -rock $(SEED).d
 endif
 
-create: download $(SEED)
-	$(foreach p,$(POOLS),$(call create_pool,$(p)))
-	$(foreach v,$(VOLUMES),$(call create_volume,$(v)))
+# Creates only what is Shared. Run it for one VM at a time, and the VMs can then be created
+# in parallel: no two of them upload the same image at once.
+create-shared: download
+	$(foreach p,$(call with_policy,POOL,Shared,$(POOLS)),$(call create_pool,$(p)))
+	$(foreach v,$(call with_policy,VOLUME,Shared,$(VOLUMES)),$(call create_volume,$(v)))
+
+create: create-shared $(SEED)
+	$(foreach p,$(call with_policy,POOL,Disposable Reusable,$(POOLS)),$(call create_pool,$(p)))
+	$(foreach v,$(call with_policy,VOLUME,Disposable Reusable,$(VOLUMES)),$(call create_volume,$(v)))
 	$(VIRSH) define domain.xml
 	$(VIRSH) autostart $(if $(filter yes,$(AUTOSTART)),,--disable) $(NAME)
 
@@ -94,12 +100,13 @@ start:
 stop:
 	if $(VIRSH) domstate $(NAME) 2>/dev/null | grep running >/dev/null; then $(VIRSH) destroy $(NAME); fi
 
-# delete keeps what has deletionPolicy Retain. delete-all removes that too.
+# delete deletes what is Disposable, and delete-all what is Reusable too. What is Shared always
+# stays, because other VMs may use it, for example an image as the backing file of their disks.
 delete: stop
-	$(call teardown,$(call deletable,VOLUME,$(VOLUMES)),$(call deletable,POOL,$(POOLS)))
+	$(call teardown,$(call with_policy,VOLUME,Disposable,$(VOLUMES)),$(call with_policy,POOL,Disposable,$(POOLS)))
 
 delete-all: stop
-	$(call teardown,$(VOLUMES),$(POOLS))
+	$(call teardown,$(call with_policy,VOLUME,Disposable Reusable,$(VOLUMES)),$(call with_policy,POOL,Disposable Reusable,$(POOLS)))
 
 console:
 	$(VIRSH) console --force $(NAME)

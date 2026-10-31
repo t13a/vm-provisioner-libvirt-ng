@@ -13,7 +13,7 @@ function(image, imageDir='../../.images') {
   } },
   volumes: {
     [vm.node.imagePool.name]: { [image.volume]: {
-      deletionPolicy:: 'Retain',
+      lifecyclePolicy:: 'Shared',
       download:: image.url,
       upload:: imageDir + '/' + image.volume,
       name: image.volume,

@@ -9,8 +9,12 @@
 // Hidden fields carry what the XML cannot hold:
 //   VM      name, node (with uri), seed (the NoCloud ISO, relative to the VM directory)
 //   domain  autostart (default false)
-//   pool    autostart (default false), deletionPolicy ('Delete' or 'Retain', default 'Delete')
-//   volume  deletionPolicy, upload (a file relative to the VM directory), download (the URL of that file)
+//   pool    autostart (default false), lifecyclePolicy
+//   volume  lifecyclePolicy, upload (a file relative to the VM directory), download (the URL of that file)
+// lifecyclePolicy says what becomes of a pool or volume when its VM goes:
+//   Disposable  `make down` deletes it (the default)
+//   Reusable    it survives `make down`, and the VM uses it again; `make delete-all` deletes it
+//   Shared      other VMs use it at the same time, so it always stays; `make create-shared` creates it
 // Any other hidden field inside a section must be null, which removes an inherited element or key.
 // So a misspelled field is an error instead of a silent default.
 
@@ -79,9 +83,10 @@ local checkHidden(where, o, allowed) =
     else []
     for k in std.objectFields(o)
   ]));
+local policies = ['Disposable', 'Reusable', 'Shared'];
 local checkPolicy(where, o) =
-  local p = get(o, 'deletionPolicy', 'Delete');
-  if std.member(['Delete', 'Retain'], p) then true else fail(where, 'deletionPolicy must be Delete or Retain, not ' + p);
+  local p = get(o, 'lifecyclePolicy', 'Disposable');
+  if std.member(policies, p) then true else fail(where, 'lifecyclePolicy must be one of ' + std.join(', ', policies) + ', not ' + p);
 local checkBool(where, o, k) =
   if std.isBoolean(get(o, k, false)) then true else fail(where, k + ' must be a boolean');
 // Pool and volume names become Make variable names in vars.mk.
@@ -111,13 +116,13 @@ local check(name, vm, pools, vols) =
     checkHidden(name + '.ssh', ssh, []),
   ] + [checkHidden(name + '.' + s, vm[s], []) for s in cloudInit] + std.flattenArrays([
     local where = name + '.pools.' + p;
-    [checkName(where, p), checkHidden(where, pools[p], ['autostart', 'deletionPolicy']),
+    [checkName(where, p), checkHidden(where, pools[p], ['autostart', 'lifecyclePolicy']),
      checkBool(where, pools[p], 'autostart'), checkPolicy(where, pools[p])]
     for p in std.objectFields(pools)
   ]) + std.flattenArrays([
     local where = name + '.volumes.' + x.id;
     [checkName(where, x.pool), checkName(where, x.name),
-     checkHidden(where, x.obj, ['deletionPolicy', 'download', 'upload']), checkPolicy(where, x.obj),
+     checkHidden(where, x.obj, ['download', 'lifecyclePolicy', 'upload']), checkPolicy(where, x.obj),
      if get(x.obj, 'download', '') != '' && get(x.obj, 'upload', '') == '' then fail(where, 'download needs upload') else true,
      capacityFrom(where, x.obj) != '']
     for x in vols
@@ -146,9 +151,9 @@ local vars(name, vm, pools, vols) =
     VOLUMES: std.join(' ', [x.id for x in ordered]),
   } + std.foldl(function(acc, p) acc + record('POOL.' + p, {
     autostart: yesNo(get(pools[p], 'autostart', false)),
-    deletionPolicy: get(pools[p], 'deletionPolicy', 'Delete'),
+    lifecyclePolicy: get(pools[p], 'lifecyclePolicy', 'Disposable'),
   }), std.objectFields(pools), {}) + std.foldl(function(acc, x) acc + record('VOLUME.' + x.id, {
-    deletionPolicy: get(x.obj, 'deletionPolicy', 'Delete'),
+    lifecyclePolicy: get(x.obj, 'lifecyclePolicy', 'Disposable'),
     upload: get(x.obj, 'upload', ''),
     download: get(x.obj, 'download', ''),
     capacity: capacityFrom(name + '.volumes.' + x.id, x.obj),
