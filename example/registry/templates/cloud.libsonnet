@@ -47,6 +47,7 @@ function(image, imageDir='../../.images') {
       readonly: {},
     },
   } },
+  // cloud-init reads a name with a dot as an FQDN, so the hostname would end at the first dot.
   metaData: { 'instance-id': vm.name, 'local-hostname': vm.name },
   userData: { packages: ['qemu-guest-agent'], runcmd: ['systemctl enable --now qemu-guest-agent'] },
   ssh: { user: image.sshUser },

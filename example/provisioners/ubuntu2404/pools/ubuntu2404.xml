@@ -1,0 +1,6 @@
+<pool type="dir">
+  <name>ubuntu2404</name>
+  <target>
+    <path>/var/lib/libvirt/images/ubuntu2404</path>
+  </target>
+</pool>

@@ -1,0 +1,6 @@
+<volume>
+  <name>debian13-seed.iso</name>
+  <target>
+    <format type="raw"/>
+  </target>
+</volume>

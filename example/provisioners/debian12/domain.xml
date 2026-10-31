@@ -1,0 +1,33 @@
+<domain type="kvm">
+  <cpu mode="host-passthrough"/>
+  <devices>
+    <console type="pty"/>
+    <disk device="cdrom" type="volume">
+      <driver name="qemu" type="raw"/>
+      <readonly/>
+      <source pool="debian12" volume="debian12-seed.iso"/>
+      <target bus="sata" dev="sda"/>
+    </disk>
+    <disk device="disk" type="volume">
+      <driver name="qemu" type="qcow2"/>
+      <source pool="debian12" volume="debian12-boot.qcow2"/>
+      <target bus="virtio" dev="vda"/>
+    </disk>
+    <interface type="network">
+      <model type="virtio"/>
+      <source network="default"/>
+    </interface>
+    <serial type="pty"/>
+  </devices>
+  <features>
+    <acpi/>
+    <apic/>
+  </features>
+  <memory unit="MiB">1024</memory>
+  <name>debian12</name>
+  <os>
+    <type arch="x86_64" machine="q35">hvm</type>
+  </os>
+  <uuid>05257b80-1acc-a47e-9d08-c909e7b98287</uuid>
+  <vcpu>1</vcpu>
+</domain>

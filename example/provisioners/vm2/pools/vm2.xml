@@ -1,6 +1,0 @@
-<pool type="dir">
-  <name>vm2</name>
-  <target>
-    <path>/srv/libvirt/images/vm2</path>
-  </target>
-</pool>

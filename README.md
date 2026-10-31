@@ -27,9 +27,9 @@ $ podman run --rm --userns=keep-id -v ./registry:/src/registry vm-provisioner-li
 Each VM gets its own Makefile. Its targets run on the host and need virsh, xorriso, curl, and ssh.
 
 ```console
-$ make -C provisioners/vm1 up              # create and start vm1
-$ make -C provisioners/vm1 wait-for-ready  # wait for SSH and cloud-init
-$ make -C provisioners/vm1 down            # delete vm1, but keep what has deletionPolicy Retain
+$ make -C provisioners/debian13 up              # create and start debian13
+$ make -C provisioners/debian13 wait-for-ready  # wait for SSH and cloud-init
+$ make -C provisioners/debian13 down            # delete debian13, but keep what has deletionPolicy Retain
 ```
 
 ## Layout

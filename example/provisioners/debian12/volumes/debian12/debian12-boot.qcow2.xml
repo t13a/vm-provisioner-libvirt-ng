@@ -1,0 +1,10 @@
+<volume>
+  <backingStore>
+    <format type="qcow2"/>
+    <path>/var/lib/libvirt/images/debian-cloud-12-amd64.qcow2</path>
+  </backingStore>
+  <name>debian12-boot.qcow2</name>
+  <target>
+    <format type="qcow2"/>
+  </target>
+</volume>

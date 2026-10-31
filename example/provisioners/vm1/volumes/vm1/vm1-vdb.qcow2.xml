@@ -1,7 +1,0 @@
-<volume>
-  <capacity unit="GiB">10</capacity>
-  <name>vm1-vdb.qcow2</name>
-  <target>
-    <format type="qcow2"/>
-  </target>
-</volume>

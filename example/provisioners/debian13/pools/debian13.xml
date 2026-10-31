@@ -1,0 +1,6 @@
+<pool type="dir">
+  <name>debian13</name>
+  <target>
+    <path>/srv/libvirt/images/debian13</path>
+  </target>
+</pool>

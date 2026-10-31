@@ -1,6 +1,0 @@
-<volume>
-  <name>vm2-seed.iso</name>
-  <target>
-    <format type="raw"/>
-  </target>
-</volume>

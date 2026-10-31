@@ -1,0 +1,10 @@
+<volume>
+  <backingStore>
+    <format type="qcow2"/>
+    <path>/var/lib/libvirt/images/ubuntu-cloud-26.04-amd64.qcow2</path>
+  </backingStore>
+  <name>ubuntu2604-boot.qcow2</name>
+  <target>
+    <format type="qcow2"/>
+  </target>
+</volume>

@@ -16,7 +16,9 @@
     'staticIp': import 'templates/staticIp.libsonnet',
   },
   vms: {
-    'vm1': (import 'vms/vm1.libsonnet') + { name: 'vm1' },
-    'vm2': (import 'vms/vm2.libsonnet') + { name: 'vm2' },
+    'debian12': (import 'vms/debian12.libsonnet') + { name: 'debian12' },
+    'debian13': (import 'vms/debian13.libsonnet') + { name: 'debian13' },
+    'ubuntu2404': (import 'vms/ubuntu2404.libsonnet') + { name: 'ubuntu2404' },
+    'ubuntu2604': (import 'vms/ubuntu2604.libsonnet') + { name: 'ubuntu2604' },
   },
 }

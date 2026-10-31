@@ -1,0 +1,6 @@
+<volume>
+  <name>ubuntu2404-seed.iso</name>
+  <target>
+    <format type="raw"/>
+  </target>
+</volume>
