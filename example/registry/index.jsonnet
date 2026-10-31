@@ -12,8 +12,10 @@
     'base': import 'templates/base.libsonnet',
     'cloud': import 'templates/cloud.libsonnet',
     'dataDisk': import 'templates/dataDisk.libsonnet',
-    'headless': import 'templates/headless.libsonnet',
+    'spice': import 'templates/spice.libsonnet',
     'staticIp': import 'templates/staticIp.libsonnet',
+    'video': import 'templates/video.libsonnet',
+    'vnc': import 'templates/vnc.libsonnet',
   },
   vms: {
     'debian12': (import 'vms/debian12.libsonnet') + { name: 'debian12' },

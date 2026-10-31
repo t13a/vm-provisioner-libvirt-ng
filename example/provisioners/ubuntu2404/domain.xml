@@ -18,7 +18,6 @@
       <source pool="ubuntu2404" volume="ubuntu2404-vdb.qcow2"/>
       <target bus="virtio" dev="vdb"/>
     </disk>
-    <graphics type="vnc"/>
     <interface type="network">
       <mac address="52:54:00:a8:7a:0b"/>
       <model type="virtio"/>

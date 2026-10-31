@@ -18,6 +18,9 @@
       <source network="default"/>
     </interface>
     <serial type="pty"/>
+    <video>
+      <model type="vga"/>
+    </video>
   </devices>
   <features>
     <acpi/>
