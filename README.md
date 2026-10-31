@@ -38,7 +38,7 @@ To create VMs in parallel, first run `make create-shared` for one VM at a time. 
 
 - `src/` holds what goes into the image:
   - `main.jsonnet` renders the VMs into provisioners. The comment at its top describes the VM format.
-  - `v1.mk` defines the targets of each VM's Makefile. The renderer copies it into the provisioners.
+  - `rules.mk` defines the targets of each VM's Makefile. The renderer copies it into the provisioners.
   - The `Makefile` runs the renderer.
 - `example/registry/` is an example registry. `vms/` has one file per VM, and each VM is composed from the other directories.
 - `example/provisioners/` holds what the image renders from the example registry.
