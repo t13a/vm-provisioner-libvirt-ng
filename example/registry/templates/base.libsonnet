@@ -23,6 +23,8 @@ local uuid(s) = local h = std.md5(s); h[0:8] + '-' + h[8:12] + '-' + h[12:16] + 
       'interface:default': { '@type': 'network', source: { '@network': vm.node.network }, model: { '@type': 'virtio' } },
       serial: { '@type': 'pty' },
       console: { '@type': 'pty' },
+      // The QEMU guest agent in the guest talks to the host through this port.
+      'channel:org.qemu.guest_agent.0': { '@type': 'unix', target: { '@type': 'virtio', '@name': 'org.qemu.guest_agent.0' } },
     },
   },
 }

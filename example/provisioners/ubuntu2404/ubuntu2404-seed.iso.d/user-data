@@ -3,4 +3,4 @@ packages:
 - "qemu-guest-agent"
 - "git"
 runcmd:
-- "systemctl enable --now qemu-guest-agent"
+- "systemctl start qemu-guest-agent"

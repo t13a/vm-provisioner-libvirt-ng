@@ -49,6 +49,8 @@ function(image, imageDir='../../.images') {
   } },
   // cloud-init reads a name with a dot as an FQDN, so the hostname would end at the first dot.
   metaData: { 'instance-id': vm.name, 'local-hostname': vm.name },
-  userData: { packages: ['qemu-guest-agent'], runcmd: ['systemctl enable --now qemu-guest-agent'] },
+  // The agent's unit has no [Install] section: udev starts it when the port of base appears, and on
+  // the first boot that happens before the package is installed. So the first boot starts it here.
+  userData: { packages: ['qemu-guest-agent'], runcmd: ['systemctl start qemu-guest-agent'] },
   ssh: { user: image.sshUser },
 }

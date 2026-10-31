@@ -5,5 +5,4 @@ t.base
 + t.cloud(image=r.images.debian(version='12'))
 + {
   node: r.nodes.hv2,
-  userData+: { runcmd:: null },
 }

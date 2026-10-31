@@ -1,6 +1,9 @@
 <domain type="kvm">
   <cpu mode="host-passthrough"/>
   <devices>
+    <channel type="unix">
+      <target name="org.qemu.guest_agent.0" type="virtio"/>
+    </channel>
     <console type="pty"/>
     <disk device="cdrom" type="volume">
       <driver name="qemu" type="raw"/>

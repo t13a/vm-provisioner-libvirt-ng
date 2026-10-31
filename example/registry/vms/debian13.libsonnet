@@ -7,6 +7,4 @@ t.base
 + t.video()
 + {
   node: r.nodes.hv2,
-  // Subtraction: hide the inherited key, so it is not rendered.
-  userData+: { runcmd:: null },
 }
